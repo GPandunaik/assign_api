@@ -1,0 +1,53 @@
+import React, { useState, useEffect }
+from 'react';
+import axios from 'axios';
+import { Chart } from 'chart.js';
+
+function PatientDetails() {
+  const [patientData, setPatientData] = useState(null);
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      const response = await axios.get('https://documenter.getpostman.com/view/11861104/2sA35G42ve');
+      const jessicaTaylorData = response.data.find(patient => patient.name === 'Jessica Taylor');
+      setPatientData(jessicaTaylorData);
+    };
+
+    fetchPatientData();
+  }, []);
+
+  if (!patientData) {
+    return <div>Loading...</div>;
+  }
+
+  const bloodPressureData = {
+    labels: ['Oct 2020', 'Dec 2020', 'Feb 2021', 'Apr 2021', 'Jun 2021', 'Aug 2021', 'Oct 2021', 'Dec 2021'],
+    datasets: [{
+      label: 'Blood Pressure',
+      data: patientData.bloodPressure,
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }]
+  };
+
+  return (
+    <div>
+      <h2>Jessica Taylor</h2>
+      <p>Age: {patientData.age}</p>
+      {/* ... other details */}
+
+      <canvas id="bloodPressureChart"></canvas>
+
+      <script>
+        const ctx = document.getElementById('bloodPressureChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: bloodPressureData,
+          options: {
+            // ... Chart.js options
+          }
+        });
+      </script>
+    </div>
+  );
+}
